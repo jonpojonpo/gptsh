@@ -1,0 +1,110 @@
+import openai
+import argparse
+import json
+from dotenv import load_dotenv
+import os
+from function_loader import load_functions
+
+# Load the API key
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    print("Error: API Key not found in .env file")
+    exit(1)
+
+
+def execute_python_code(code):
+    try:
+        return str(eval(code))
+    except Exception as e:
+        return str(e)
+
+def main():
+    load_dotenv()
+    # Get the API key
+    api_key = os.getenv("OPENAI_API_KEY")
+    functions, available_functions = load_functions("functions_config.json")
+    parser = argparse.ArgumentParser(description='Chat with OpenAI GPT.')
+    parser.add_argument('--model', type=str, default='gpt-3.5-turbo-0613',
+                        help='The model to be used by OpenAI GPT.')
+    parser.add_argument('--prompt', type=str, default='The assistant is ready:',
+                        help='The initial prompt to use for the conversation.')
+    args = parser.parse_args()
+
+    model = args.model
+    prompt = args.prompt
+
+    # Start the conversation
+    messages = [{'role': 'system', 'content': prompt}]
+
+    print(f"{prompt}")
+
+    while True:
+        try:
+            user_input = input("User: ")
+            if user_input.lower() in ["exit", "quit"]:
+                print("Exiting.")
+                break
+
+            messages.append({'role': 'user', 'content': user_input})
+
+            print("Sending request to OpenAI")
+            response = openai.ChatCompletion.create(
+                model=model,
+                messages=messages,
+                functions=functions,
+                function_call="auto"
+            )
+            print("Received response from OpenAI")
+
+            response_message = response["choices"][0]["message"]
+
+            # Check if GPT wanted to call a function
+            if 'function_call' in response_message:
+                print("Function call requested")
+                function_name = response_message["function_call"]["name"]
+                print(f"Function name: {function_name}")
+                function_to_call = available_functions[function_name]
+                arguments = response_message["function_call"]["arguments"]
+                print(f"Raw arguments: {arguments}")
+
+                # Assuming the arguments contain the code to be executed directly
+                arguments = json.loads(arguments) 
+                function_response = function_to_call(**arguments)
+                # Function response might be a number or any other data type
+                # Convert it to string before appending it to messages.
+                print(f"Function response: {function_response}")
+                function_response = str(function_response)
+
+                # Append function response
+                messages.append({
+                    "role": "function",
+                    "name": function_name,
+                    "content": function_response,
+                })
+
+                # Make an additional call to OpenAI API with function response
+                print("Sending second request to OpenAI with function response")
+                second_response = openai.ChatCompletion.create(
+                    model=model,
+                    messages=messages,
+                    functions=functions
+                )
+                print("Received second response from OpenAI")
+
+                # Get the assistant's message from the second response
+                assistant_second_message = second_response["choices"][0]["message"]
+                print(f"Assistant: {assistant_second_message['content']}")
+
+            else:
+                print(f"Assistant: {response_message['content']}")
+
+        except KeyboardInterrupt:
+            print("\nExiting.")
+            break
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    main()
+

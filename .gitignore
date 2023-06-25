@@ -1,0 +1,20 @@
+# Ignore the .env file to keep API keys and other secrets out of version control
+.env
+
+# Ignore Python cache files and directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environment directories
+venv/
+env/
+
+# Ignore build artifacts
+build/
+dist/
+
+# Ignore Jupyter Notebook files
+*.ipynb
+gpt
