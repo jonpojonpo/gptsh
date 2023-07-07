@@ -20,17 +20,65 @@
     },
     {
         "module": "custom_functions",
-        "name": "evaluate_expression",
-        "description": "Evaluates a mathematical expression",
+        "name": "write_to_file",
+        "description": "Write text to a file on the local system",
         "parameters": {
-            "type": "object",
-            "properties": {
-                "expression": {
-                    "type": "string",
-                    "description": "The mathematical expression to evaluate"
-                }
+          "type": "object",
+          "properties": {
+            "file_name": {
+              "type": "string",
+              "description": "The name of the file to write to"
             },
-            "required": ["expression"]
+            "text": {
+              "type": "string",
+              "description": "The text content to write to the file"
+            },
+            "mode": {
+              "type": "string",
+              "enum": ["write", "append"],
+              "description": "Whether to write to a new file or append to an existing file"
+            }
+          },
+          "required": ["file_name", "text"]
         }
-    }
+      },
+      {
+        "module": "custom_functions",
+        "name": "read_from_file",
+        "description": "Read text from a file on the local system",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_name": {
+              "type": "string",
+              "description": "The name of the file to read from"
+            }
+          },
+          "required": ["file_name"]
+        },
+        "return": {
+          "type": "string",
+          "description": "The text content of the file"
+        }
+      },
+      {
+        "module": "custom_functions",
+        "name": "search_in_docs",
+        "description": "Search for a term in text documents within the ./docs directory and return their content",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "search_term": {
+              "type": "string",
+              "description": "The term to search for in the documents"
+            }
+          },
+          "required": ["search_term"]
+        },
+        "return": {
+          "type": "object",
+          "description": "A dictionary where keys are file names and values are the contents of files in which the search term is found"
+        }
+      }
+
 ]
