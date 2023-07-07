@@ -46,34 +46,12 @@ def read_from_file(file_name):
     
     return content       
 
-import os
+import subprocess
 
-def search_in_docs(search_term):
-    """
-    Search for a term in text documents within the ./docs directory.
-    
-    :param search_term: The term to search for in the documents.
-    :return: A dictionary where keys are file names and values are the contents
-             of files in which the search term is found.
-    """
-    # Directory where the documents are stored
-    docs_dir = './docs'
-    
-    # Dictionary to store the names and contents of files containing the search term
-    matching_files = {}
-    
-    # Iterate through each file in the directory
-    for file_name in os.listdir(docs_dir):
-        # Construct the full file path
-        file_path = os.path.join(docs_dir, file_name)
-        
-        # Read and search in the file if it is a file
-        if os.path.isfile(file_path):
-            with open(file_path, 'r') as file:
-                content = file.read()
-                # Check if the search term is in the content
-                if search_term.lower() in content.lower():
-                    matching_files[file_name] = content
-                    return matching_files
-    
-    return matching_files
+def execute_shell_command(command):
+    try:
+        output = subprocess.check_output(command, shell=True)
+        return output.decode("utf-8")
+    except subprocess.CalledProcessError as e:
+        return e.output.decode("utf-8")
+

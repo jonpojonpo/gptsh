@@ -1,25 +1,6 @@
 [
     {
         "module": "custom_functions",
-        "name": "get_current_weather",
-        "description": "Get the current weather in a given location",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "location": {
-                    "type": "string",
-                    "description": "The city and state, e.g. San Francisco, CA"
-                },
-                "unit": {
-                    "type": "string",
-                    "enum": ["celsius", "fahrenheit"]
-                }
-            },
-            "required": ["location"]
-        }
-    },
-    {
-        "module": "custom_functions",
         "name": "write_to_file",
         "description": "Write text to a file on the local system",
         "parameters": {
@@ -62,23 +43,21 @@
         }
       },
       {
-        "module": "custom_functions",
-        "name": "search_in_docs",
-        "description": "Search for a term in text documents within the ./docs directory and return their content",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "search_term": {
-              "type": "string",
-              "description": "The term to search for in the documents"
+    "module": "custom_functions",
+    "name": "execute_shell_command",
+    "description": "Execute a shell command in Kali Linux",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "command": {
+                "type": "string",
+                "description": "The shell command to be executed"
             }
-          },
-          "required": ["search_term"]
         },
-        "return": {
-          "type": "object",
-          "description": "A dictionary where keys are file names and values are the contents of files in which the search term is found"
-        }
-      }
-
-]
+        "required": ["command"]
+    },
+    "return": {
+        "type": "string",
+        "description": "The output of the shell command"
+    }
+}]
