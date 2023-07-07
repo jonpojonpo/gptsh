@@ -4,12 +4,17 @@ import openai
 import argparse
 import json
 from dotenv import load_dotenv
+from prompt_toolkit import prompt
+from prompt_toolkit import PromptSession
+from prompt_toolkit.history import FileHistory
+
 import os
 from function_loader import load_functions
 
 # Load the API key
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
+user = os.getenv("USER")
 if not api_key:
     print("Error: API Key not found in .env file")
     exit(1)
@@ -29,21 +34,24 @@ def main():
     parser = argparse.ArgumentParser(description='Chat with OpenAI GPT.')
     parser.add_argument('--model', type=str, default='gpt-3.5-turbo-0613',
                         help='The model to be used by OpenAI GPT.')
-    parser.add_argument('--prompt', type=str, default='The assistant is ready:',
+    parser.add_argument('--prompt', type=str, default='The AlphaMind is ready:',
                         help='The initial prompt to use for the conversation.')
     args = parser.parse_args()
 
     model = args.model
-    prompt = args.prompt
+    sysprompt = args.prompt
+    user_prompt = user + "> "
+    prompt_history = FileHistory(".gptsh_history")
+    session = PromptSession(history=prompt_history)
 
     # Start the conversation
-    messages = [{'role': 'system', 'content': prompt}]
+    messages = [{'role': 'system', 'content': sysprompt}]
 
-    print(f"{prompt}")
+    print(f"{sysprompt}\n")
 
     while True:
         try:
-            user_input = input("User: ")
+            user_input = session.prompt(user_prompt)
             if user_input.lower() in ["exit", "quit"]:
                 print("Exiting.")
                 break
@@ -96,10 +104,10 @@ def main():
 
                 # Get the assistant's message from the second response
                 assistant_second_message = second_response["choices"][0]["message"]
-                print(f"Assistant: {assistant_second_message['content']}")
+                print(f"{model}> {assistant_second_message['content']}")
 
             else:
-                print(f"Assistant: {response_message['content']}")
+                print(f"{model}> {response_message['content']}")
 
         except KeyboardInterrupt:
             print("\nExiting.")
