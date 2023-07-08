@@ -1,13 +1,15 @@
-# GPTSH - OpenAI GPT Chat Interface
+# GPTsh - Your Interactive Programming Assistant
 
-GPTSH is a command-line interface (CLI) for interacting with OpenAI's GPT-3.5 Turbo model through the OpenAI API. It allows users to have a conversation with GPT, call custom functions, and perform calculations through Python's `eval` function. This tool provides a text-only client and supports loading custom functions from a configuration file.
+GPTsh is a powerful tool that lets you interact with OpenAI's GPT-4 in a shell-like environment. You can write code, execute shell commands, run database queries, and much more, all with the power of AI.
+
 
 ## Features
 
 - Text-only interface for chatting with GPT
-- Integration of custom functions through a configuration file
+- Dynamic integration of custom functions through a functionGPT assistant 
 - Python code execution
-- Support for keeping context in conversation
+- Command line shell code execution
+- Support for keeping context in conversation and chat history that can be scrolled through
 - Utilizes the OpenAI Chat Completions API
 
 ## Installation
@@ -28,64 +30,46 @@ GPTSH is a command-line interface (CLI) for interacting with OpenAI's GPT-3.5 Tu
     OPENAI_API_KEY=your_api_key_here
     ```
 
-4. Make sure the `.env` file is listed in `.gitignore` to keep your API key secure:
-    ```
-    echo ".env" >> .gitignore
-    ```
 
-## Usage
+# GPTsh - Your Interactive Programming Assistant
 
-1. Run the GPTSH interface:
-    ```
-    python gptsh.py
-    ```
+GPTsh is a powerful tool that lets you interact with OpenAI's GPT-4 in a shell-like environment. You can write code, execute shell commands, run database queries, and much more, all with the power of AI.
 
-2. Optional: You can pass command-line arguments to specify a custom model and prompt:
-    ```
-    python gptsh.py --model gpt-3.5-turbo-0613 --prompt "Hello, how can I assist you today?"
-    ```
+## Key Features
 
-3. Chat with the model by typing your messages. To end the session, type `exit` or `quit`.
+* Execute GPT Functions: GPTsh can execute predefined functions. These functions can run shell commands, SQL queries, write files, and more. The possibilities are virtually endless.
 
-## Custom Functions
+* Dynamic Function Addition: Adding new functions is easy. Just use the provided script `add-function.sh`, or have the assistant write the function and its schema for you in the shell.
 
-You can define custom functions in a Python file (e.g., `custom_functions.py`) and specify them in a JSON configuration file (e.g., `functions_config.json`). 
+* System Prompts: The system prompts are customizable and can be set at runtime via command line flags. You can also add your own prompts!
 
-### Example functions_config.json:
+* Token-efficient Design: The GPTsh tool is designed to be token-efficient. It manages tokens for you, so you don't have to worry about exceeding the maximum limit.
 
-```json
-[
-    {
-        "name": "execute_python_code",
-        "description": "Executes Python code.",
-        "module": "custom_functions",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string",
-                    "description": "The Python code to execute."
-                }
-            },
-            "required": ["code"]
-        }
-    }
-]
-```
-## Example custom_functions.py:
-```python
-def execute_python_code(code):
-    try:
-        return str(eval(code))
-    except Exception as e:
-        return str(e)
-```
+## How to Use GPTsh
 
-## Contributing
-Contributions are welcome! Please feel free to submit a pull request or create an issue.
+1. **Start the Shell**
 
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+```bash
+./gptsh
 
-## Disclaimer
-This tool communicates with OpenAI's API and may incur costs. Please be mindful of the number of API requests made and be aware of OpenAI's pricing. Additionally, please adhere to OpenAI's terms of service and use responsibly.
+    Select a System Prompt
+
+You can select a specific system prompt using the --prompt-file flag:
+
+bash
+
+./gptsh --prompt-file functionGPT
+
+    Add a Function
+
+You can add a new function using the add-function.sh script:
+
+bash
+
+./add-function.sh
+
+This will open the GPTsh shell with a specific prompt that guides the assistant in writing a new function and its schema.
+
+How to Contribute
+
+You're welcome to contribute to the development of GPTsh! Feel free to submit a pull request if you've made any improvements or fixed any bugs.
