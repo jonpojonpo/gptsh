@@ -16,7 +16,7 @@ GPTsh is a powerful tool that lets you interact with OpenAI's GPT-4 in a shell-l
 
 1. Clone this repository:
     ```
-    git clone https://github.com/yourusername/gptsh.git
+    git clone https://github.com/jonpojonpo/gptsh.git
     cd gptsh
     ```
 
@@ -30,10 +30,6 @@ GPTsh is a powerful tool that lets you interact with OpenAI's GPT-4 in a shell-l
     OPENAI_API_KEY=your_api_key_here
     ```
 
-
-# GPTsh - Your Interactive Programming Assistant
-
-GPTsh is a powerful tool that lets you interact with OpenAI's GPT-4 in a shell-like environment. You can write code, execute shell commands, run database queries, and much more, all with the power of AI.
 
 ## Key Features
 
