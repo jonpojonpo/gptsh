@@ -9,7 +9,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 
 import os
-from function_loader import load_functions
+from gpt_functions import functions, get_function, get_function_schema, get_available_functions
 
 # Load the API key
 load_dotenv()
@@ -20,26 +20,35 @@ if not api_key:
     exit(1)
 
 
-def execute_python_code(code):
-    try:
-        return str(eval(code))
-    except Exception as e:
-        return str(e)
+def load_system_prompt(prompt_name):
+    with open(f'system_prompts/{prompt_name}.txt', 'r') as prompt_file:
+        return prompt_file.read()
+
 
 def main():
     load_dotenv()
     # Get the API key
     api_key = os.getenv("OPENAI_API_KEY")
-    functions, available_functions = load_functions("functions_config.json")
+    available_functions = get_available_functions()
+    #Create a dictionary with function schemas
+    function_schemas = {name: get_function_schema(name) for name in available_functions}
     parser = argparse.ArgumentParser(description='Chat with OpenAI GPT.')
+
     parser.add_argument('--model', type=str, default='gpt-3.5-turbo-0613',
                         help='The model to be used by OpenAI GPT.')
-    parser.add_argument('--prompt', type=str, default='The AlphaMind is ready:',
-                        help='The initial prompt to use for the conversation.')
+    #parser.add_argument('--prompt', type=str, default='The AlphaMind is ready:',
+    #                    help='The initial prompt to use for the conversation.')
+    parser.add_argument('--prompt-file', type=str, default='AlphaMind',
+                        help='The name of the prompt-file to use for the conversation.')
+    parser.add_argument('--functions', nargs='+', choices=available_functions, default=available_functions,
+                        help='The functions to be loaded. Options: ' + ', '.join(available_functions))    
     args = parser.parse_args()
 
+    # Load the selected functions
+    functions = {f: get_function(f) for f in args.functions}
+    function_schemas = [ get_function_schema(f) for f in args.functions]
     model = args.model
-    sysprompt = args.prompt
+    sysprompt = load_system_prompt(args.prompt_file) 
     user_prompt = user + "> "
     prompt_history = FileHistory(".gptsh_history")
     session = PromptSession(history=prompt_history)
@@ -59,22 +68,24 @@ def main():
             messages.append({'role': 'user', 'content': user_input})
 
             print("Sending request to OpenAI")
+            print(function_schemas)
             response = openai.ChatCompletion.create(
                 model=model,
                 messages=messages,
-                functions=functions,
+                functions=function_schemas,
                 function_call="auto"
             )
             print("Received response from OpenAI")
 
             response_message = response["choices"][0]["message"]
+            print(response_message)
 
             # Check if GPT wanted to call a function
             if 'function_call' in response_message:
                 print("Function call requested")
                 function_name = response_message["function_call"]["name"]
                 print(f"Function name: {function_name}")
-                function_to_call = available_functions[function_name]
+                function_to_call = get_function(function_name)
                 arguments = response_message["function_call"]["arguments"]
                 print(f"Raw arguments: {arguments}")
 
@@ -98,7 +109,7 @@ def main():
                 second_response = openai.ChatCompletion.create(
                     model=model,
                     messages=messages,
-                    functions=functions
+                    functions=function_schemas
                 )
                 print("Received second response from OpenAI")
 
